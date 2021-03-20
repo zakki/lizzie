@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -880,10 +881,15 @@ public class Leelaz {
     listeners.remove(listener);
   }
 
-  private synchronized void notifyBestMoveListeners() {
-    for (LeelazListener listener : listeners) {
-      listener.bestMoveNotification(bestMoves);
-    }
+  private void notifyBestMoveListeners() {
+    SwingUtilities.invokeLater(
+        () -> {
+          synchronized (this) {
+            for (LeelazListener listener : listeners) {
+              listener.bestMoveNotification(bestMoves);
+            }
+          }
+        });
   }
 
   private static enum ParamState {
